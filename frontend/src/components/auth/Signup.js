@@ -124,6 +124,7 @@ const Signup = () => {
 
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
+      
       navigate("/chats");
     } catch (error) {
       toast({
@@ -151,6 +152,7 @@ const Signup = () => {
       <FormControl id='email' isRequired>
         <FormLabel>Email</FormLabel>
         <Input
+          type={"email"}
           placeholder='Enter your email'
           onChange={(e) => setEmail(e.target.value)}
         />
