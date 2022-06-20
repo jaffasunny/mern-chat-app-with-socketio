@@ -42,6 +42,7 @@ const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
+  
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
@@ -52,8 +53,26 @@ const authUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(401);
-    throw new Error("Invalid Email or Passowrd").red.bold;
+    throw new Error("Invalid Email or Password").red.bold;
   }
 });
 
-module.exports = { registerUser, authUser };
+// /api/user?search=jaffer
+// if we want to take id=user from url we use req.params
+// and if we want to take query from url we use req.query.queryname
+const allUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  // except this user return every other user
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  res.send(users);
+});
+
+module.exports = { allUsers, registerUser, authUser };
